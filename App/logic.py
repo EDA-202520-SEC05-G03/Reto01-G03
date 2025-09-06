@@ -1,10 +1,24 @@
 import time
+import csv
+from DataStructures.List import array_list as lt
+
+
+csv.field_size_limit(2147483647)
 
 def new_logic():
     """
     Crea el catalogo para almacenar las estructuras de datos
     """
     #TODO: Llama a las funciónes de creación de las estructuras de datos
+    
+    catalog = {
+        'trips': None,
+        'neighborhoods': None,
+    }
+
+    catalog['trips'] = lt.new_list()
+    catalog['neighborhoods'] = lt.new_list()
+
     pass
 
 
@@ -15,7 +29,13 @@ def load_data(catalog, filename):
     Carga los datos del reto
     """
     # TODO: Realizar la carga de datos
-    pass
+
+    input_file = csv.DictReader(open(filename, encoding='utf-8'))
+    for record in input_file:
+        lt.add_last(catalog['trips'], record)
+    for neighborhood in input_file:
+        lt.add_last(catalog['neighborhoods'], neighborhood)
+    return catalog
 
 # Funciones de consulta sobre el catálogo
 
@@ -24,7 +44,9 @@ def get_data(catalog, id):
     Retorna un dato por su ID.
     """
     #TODO: Consulta en las Llamar la función del modelo para obtener un dato
-    pass
+    
+    return lt.getElement(catalog['trips'], id)
+    
 
 
 def req_1(catalog):
