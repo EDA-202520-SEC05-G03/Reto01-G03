@@ -11,7 +11,7 @@ def new_logic():
 def print_menu():
     print("Bienvenido")
     print("1- Cargar información")
-    print("2- Ejecutar Requerimiento 1")
+    print("2- Calcular la información promedio de los trayectos dado una cantidad de pasajeros")
     print("3- Ejecutar Requerimiento 2")
     print("4- Ejecutar Requerimiento 3")
     print("5- Ejecutar Requerimiento 4")
@@ -44,6 +44,17 @@ def print_req_1(control):
         Función que imprime la solución del Requerimiento 1 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 1
+    
+    avg_time, avg_distance, avg_cost, avg_tolls, avg_tip, most_used_payment_type, most_frequent_date, time = lg.req_1(control, passengers)
+    print("El tiempo promedio de los trayectos es: " + str(avg_time))
+    print("La distancia promedio de los trayectos es: " + str(avg_distance))
+    print("El costo promedio de los trayectos es: " + str(avg_cost))
+    print("El peaje promedio de los trayectos es: " + str(avg_tolls))
+    print("La propina promedio de los trayectos es: " + str(avg_tip))
+    print("El método de pago más usado es: " + most_used_payment_type)
+    print("La fecha de inicio de trayecto con mayor frecuencia es: " + most_frequent_date)
+    print("El tiempo de ejecución fue: " + str(time) + " segundos")
+
     pass
 
 
@@ -120,7 +131,9 @@ def main():
             print("Cargando información de los archivos ....\n")
             data = load_data(control)
         elif int(inputs) == 2:
-            print_req_1(control)
+            passengers = int(input("Ingrese la cantidad de pasajeros: "))
+            print("Calculando la información promedio de los trayectos ....\n")
+            print_req_1(control, passengers)
 
         elif int(inputs) == 3:
             print_req_2(control)
