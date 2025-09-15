@@ -1,6 +1,6 @@
 import time
 import csv
-from DataStructures.List import array_list as lt
+from DataStructures import array_list as lt
 
 
 csv.field_size_limit(2147483647)
