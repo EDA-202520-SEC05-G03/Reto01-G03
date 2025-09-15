@@ -1,6 +1,6 @@
 import time
 import csv
-from DataStructures import array_list as lt
+from DataStructures.List import array_list as lt
 
 
 csv.field_size_limit(2147483647)
@@ -49,84 +49,12 @@ def get_data(catalog, id):
     
 
 
-def req_1(catalog, passengers):
+def req_1(catalog):
     """
     Retorna el resultado del requerimiento 1
-    
-    Tiempo promedio (en minutos) de la duración de los trayectos.
-o Costo total promedio (en dólares) de los trayectos.
-o Distancia promedio (en millas) de los trayectos.
-o Costo promedio pagado en peajes de los trayectos.
-o Nombre y cantidad del tipo de pago más usado en los trayectos. (en formato “medio de pago -
-cantidad” ej. “CREDIT_CARD - 300”)
-o Cantidad de propina promedio pagada en los trayectos.
-o Fecha de inicio de trayecto con mayor frecuencia (sin tener en cuenta horas ni minutos). (con
-formato “%Y-%m-%d” ej. “2015-04-15”).
     """
     # TODO: Modificar el requerimiento 1
-    
-    a = get_time()
-    
-    amount_trips = 0
-    total_time = 0 # in seconds
-    total_cost = 0
-    total_distance = 0
-    total_tolls = 0
-    total_tip = 0
-    payment_types = {}
-
-    date_frequency = {}
-    
-    for record in catalog['trips']:
-        
-        if not cmp_function(int(record['passenger_count']), passengers):
-            amount_trips += 1
-            
-            entry = int(record['pickup_datetime'][11:13])*3600 + int(record['pickup_datetime'][14:16])*60 + int(record['pickup_datetime'][17:19])
-            exit = int(record['dropoff_datetime'][11:13])*3600 + int(record['dropoff_datetime'][14:16])*60 + int(record['dropoff_datetime'][17:19])
-            total_time += (exit - entry)
-            # Handle trips that go past midnight
-            if cmp_function(record['pickup_datetime'][0:10], record['dropoff_datetime'][0:10]):
-                total_time += 86400
-        
-            total_cost += float(record['fare_amount'])
-            
-            total_distance += float(record['trip_distance'])
-            
-            total_tolls += float(record['tolls_amount'])
-            
-            total_tip += float(record['tip_amount'])
-            
-            payment_type = record['payment_type']
-            if payment_type in payment_types:
-                payment_types[payment_type] += 1
-            else:
-                payment_types[payment_type] = 1
-            
-            trip_start_date = record['trip_start_timestamp'][0:10]
-            if trip_start_date in date_frequency:
-                date_frequency[trip_start_date] += 1
-            else:
-                date_frequency[trip_start_date] = 1
-        
-    max_payment_type = 0 
-    most_used_payment_type = ""   
-    for key in payment_types:
-        if payment_types[key] > max_payment_type:
-            max_payment_type = payment_types[key]
-            most_used_payment_type = key
-            
-    max_date_frequency = 0
-    most_frequent_date = ""
-    for key in date_frequency:
-        if date_frequency[key] > max_date_frequency:
-            max_date_frequency = date_frequency[key]
-            most_frequent_date = key   
-            
-    b = get_time()
-    time = delta_time(a, b)       
-                               
-    return total_time/amount_trips,total_distance/amount_trips,total_cost/amount_trips, total_tolls/amount_trips, total_tip/amount_trips, most_used_payment_type, most_frequent_date, time
+    pass
 
 
 def req_2(catalog):
@@ -137,12 +65,94 @@ def req_2(catalog):
     pass
 
 
-def req_3(catalog):
+def req_3(catalog,pmin,pmax):
     """
     Retorna el resultado del requerimiento 3
     """
     # TODO: Modificar el requerimiento 3
-    pass
+    t0=get_time()
+    size=lt.size(catalog['trips'])
+    cnt=0
+    tmin=0
+    tpay=0
+    tdist=0
+    tpeajes=0
+    cantpsj=[]
+    tprop=0
+    dates=[]
+    for v in range (1,size+1):
+        info=get_data(catalog,v)
+        pay=float(info['total_amount'])
+        if pmin<=pay<=pmax:
+            cnt+=1
+            h0= info["pickup_datetime"].split()[1]
+            hf=info ["dropoff_datetime"].split()[1]
+
+            hms0=h0.split(':')
+            hmsf=hf.split(':')
+
+            h1=int(hms0[0])
+            m1=int(hms0[1])
+            s1=int(hms0[2])
+
+            h2=int(hmsf[0])
+            m2=int(hmsf[1])
+            s2=int(hmsf[2])
+
+            d1=h1*3600+m1*60+s1
+            d2=h2*3600+m2*60+s2
+            if d2<d1:
+                d2+=24*3600
+            dur=(d2-d1)/60
+            tmin+=dur
+            
+            tpay+=pay
+            dist=float(info['trip_distance'])
+            tdist+=dist
+
+            peajes=float(info['tolls_amount'])
+            tpeajes+=peajes
+
+            psj = int(float(info['passenger_count']))
+            cantpsj.append(psj)
+
+            prop=float(info['tip_amount'])
+            tprop+=prop
+
+            dt=str(info["dropoff_datetime"].split()[0])
+            dates.append(dt)
+    
+    
+    if cnt==0:
+        return None
+    
+    vistospsj={}
+    for c in cantpsj:
+        if c in vistospsj:
+            vistospsj[c]+=1
+        else:
+            vistospsj[c]=1
+    modepsj = str(max(vistospsj, key=vistospsj.get))
+    cant_modepsj=str(vistospsj[modepsj])
+    freq_pj = f"{modepsj} - {cant_modepsj}"
+    vistosdt={}
+    for d in dates:
+        if d in vistosdt:
+            vistosdt[d]+=1
+        else:
+            vistosdt[d]=1
+    modedt = str(max(vistosdt, key=vistosdt.get))
+ 
+    prom_min=tmin/cnt
+    prompay=tpay/cnt
+    promdist=tdist/cnt
+    prompeaj=tpeajes/cnt
+    promprop=tprop/cnt
+    tf=get_time()
+    tiempo=delta_time(tf,t0)
+    return tiempo, prom_min, prompay, promdist, prompeaj, freq_pj, promprop, modedt
+
+
 
 
 def req_4(catalog):
@@ -200,13 +210,3 @@ def delta_time(start, end):
     elapsed = float(end - start)
     return elapsed
 
-def cmp_function(element_a, element_b):
-    """
-    Función de comparación genérica
-    """
-    if (element_a > element_b):
-        return 1
-    elif (element_a < element_b):
-        return -1
-    else:
-        return 0
